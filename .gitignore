@@ -1,0 +1,18 @@
+# Operating System Files
+Thumbs.db
+Desktop.ini
+.DS_Store
+
+# Temporary extracted files
+extracted_assets/
+*.tmp
+*.log
+
+# Python cache
+__pycache__/
+*.pyc
+
+# Redundant duplicate photos in original folder (active photos are in photos/)
+KARTU OSIS KELAS X THN 2026-2027/*/*.jpg
+KARTU OSIS KELAS X THN 2026-2027/*/*.jpeg
+KARTU OSIS KELAS X THN 2026-2027/*/*.png

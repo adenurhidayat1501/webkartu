@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 80" width="200" height="80">
+  <!-- Subtle stamp border -->
+  <ellipse cx="60" cy="40" rx="35" ry="32" fill="none" stroke="#2563EB" stroke-width="1.5" stroke-dasharray="4,2" opacity="0.6"/>
+  <ellipse cx="60" cy="40" rx="27" ry="24" fill="none" stroke="#2563EB" stroke-width="1" opacity="0.6"/>
+  <text x="60" y="32" font-family="'Times New Roman', serif" font-size="7" font-weight="bold" fill="#2563EB" text-anchor="middle" opacity="0.75" letter-spacing="1">SMKN CIPATUJAH</text>
+  <text x="60" y="42" font-family="'Times New Roman', serif" font-size="6" font-weight="bold" fill="#2563EB" text-anchor="middle" opacity="0.75">★ RESMI ★</text>
+  <text x="60" y="52" font-family="'Times New Roman', serif" font-size="6" fill="#2563EB" text-anchor="middle" opacity="0.75">KAB. TASIKMALAYA</text>
+  
+  <!-- Artistic Signature curve -->
+  <path d="M 40 55 C 60 20, 75 15, 90 35 C 105 55, 115 25, 130 30 C 145 35, 160 45, 175 40 M 80 40 Q 110 5 125 50 Q 140 25, 165 48" fill="none" stroke="#1E3A8A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M 125 45 L 180 43" fill="none" stroke="#1E3A8A" stroke-width="1.8" stroke-linecap="round"/>
+</svg>
+

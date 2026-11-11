@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ID Card Generator - SMKN CIPATUJAH</title>
+  <link rel="icon" type="image/png" href="assets/logo.png">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <!-- Top Application Header -->
+  <header class="app-header">
+    <div class="brand-section">
+      <img src="assets/logo.png" alt="Logo SMKN Cipatujah" class="brand-logo" onerror="this.style.display='none'">
+      <div class="brand-info">
+        <h1>SMKN CIPATUJAH</h1>
+        <p>Studio Generator Kartu Pelajar Otomatis</p>
+      </div>
+    </div>
+
+    <div class="header-center">
+      <div class="search-box">
+        <span class="search-icon">🔍</span>
+        <input type="text" id="search-input" placeholder="Cari berdasarkan nama siswa atau NISN...">
+      </div>
+    </div>
+
+    <div class="header-actions">
+      <button class="btn btn-secondary" id="btn-open-upload" title="Unggah data Excel atau folder foto baru">
+        <span>📁</span> Unggah Data
+      </button>
+      <button class="btn btn-secondary" id="btn-open-settings" title="Kustomisasi nama sekolah, kepsek, titimangsa, dll.">
+        <span>⚙️</span> Pengaturan
+      </button>
+      <button class="btn btn-secondary" id="btn-open-print" title="Cetak langsung dalam format lembar A4 (10 kartu/halaman)">
+        <span>🖨️</span> Cetak A4
+      </button>
+      <button class="btn btn-primary" id="btn-export-pdf" title="Ekspor PDF A4 siap cetak untuk kelas ini">
+        <span>📄</span> PDF Kelas
+      </button>
+      <button class="btn btn-primary" id="btn-export-zip" title="Unduh semua gambar kartu siswa dalam format ZIP">
+        <span>📦</span> Unduh ZIP
+      </button>
+    </div>
+  </header>
+
+  <!-- Main Application Body -->
+  <div class="app-container">
+
+    <!-- Left Sidebar: Class Roster & Stats -->
+    <aside class="app-sidebar">
+      <div class="sidebar-header">
+        <div class="sidebar-title">Daftar Rombel Kelas X</div>
+      </div>
+
+      <ul class="classes-list" id="sidebar-classes-list">
+        <!-- Rendered dynamically via JS -->
+      </ul>
+
+      <div class="sidebar-footer">
+        <div class="stat-row">
+          <span>Status Foto Siswa:</span>
+          <strong id="stat-matched-count">358 / 358 (100%)</strong>
+        </div>
+        <div class="match-progress-bar">
+          <div class="match-progress-fill" id="stat-matched-fill" style="width: 100%;"></div>
+        </div>
+        <div style="font-size: 11px; color: #64748B; margin-top: 8px;">
+          Tahun Pelajaran 2026/2027
+        </div>
+      </div>
+    </aside>
+
+    <!-- Right Main Workspace -->
+    <main class="app-main">
+
+      <!-- Class Hero Header -->
+      <section class="class-hero-banner">
+        <div class="hero-titles">
+          <h2 id="hero-class-title">X TO 1</h2>
+          <p id="hero-class-sub">Teknik Otomotif 1</p>
+        </div>
+
+        <div class="hero-actions">
+          <span class="student-idx" id="hero-student-count" style="font-size: 13px; padding: 6px 14px;">44 Siswa</span>
+          <span class="status-pill exact" id="hero-match-badge" style="font-size: 12px; padding: 6px 14px;">100% Foto Terhubung</span>
+        </div>
+      </section>
+
+      <!-- Filter Chips & View Mode Toolbar -->
+      <section class="toolbar-section">
+        <div class="filter-chips">
+          <div class="chip active" data-filter="all">Semua Siswa</div>
+          <div class="chip" data-filter="L">Laki-laki</div>
+          <div class="chip" data-filter="P">Perempuan</div>
+          <div class="chip" data-filter="has_photo">Sudah Ada Foto</div>
+          <div class="chip" data-filter="no_photo">Belum Ada Foto</div>
+        </div>
+
+        <div class="view-toggles">
+          <button class="view-btn active" data-view="grid" title="Tampilan Kartu 3D Interaktif (Bisa Dibalik)">
+            <span>🎴</span> Mode 3D Flip
+          </button>
+          <button class="view-btn" data-view="dual" title="Tampilan Berdampingan Depan & Belakang">
+            <span>📄</span> Berdampingan
+          </button>
+          <button class="view-btn" data-view="table" title="Tampilan Tabel Data">
+            <span>📋</span> Tabel
+          </button>
+        </div>
+      </section>
+
+      <!-- Cards Workspace Container -->
+      <section class="cards-workspace">
+        <div id="cards-container" class="cards-grid">
+          <!-- Student Cards rendered dynamically by JS -->
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- ==========================================================================
+       MODALS
+       ========================================================================== -->
+
+  <!-- Modal 1: Edit Student / Live Card Inspector -->
+  <div class="modal-overlay" id="modal-edit-student">
+    <div class="modal-box" style="max-width: 920px;">
+      <div class="modal-header">
+        <h3>✏️ Edit Data & Pratinjau Kartu Siswa</h3>
+        <button class="modal-close" data-modal-close>&times;</button>
+      </div>
+      <div class="modal-body">
+        <div id="edit-card-preview" style="margin-bottom: 24px;"></div>
+
+        <div class="form-grid">
+          <div class="form-group col-span-2">
+            <label>Nama Lengkap Siswa</label>
+            <input type="text" id="edit-nama" class="form-input">
+          </div>
+          <div class="form-group">
+            <label>NISN</label>
+            <input type="text" id="edit-nisn" class="form-input">
+          </div>
+          <div class="form-group">
+            <label>NIS / NIPD</label>
+            <input type="text" id="edit-nipd" class="form-input">
+          </div>
+          <div class="form-group">
+            <label>Jenis Kelamin</label>
+            <select id="edit-jk" class="form-select">
+              <option value="L">Laki-laki</option>
+              <option value="P">Perempuan</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Agama</label>
+            <input type="text" id="edit-agama" class="form-input">
+          </div>
+          <div class="form-group col-span-2">
+            <label>Tempat, Tanggal Lahir (TTL)</label>
+            <input type="text" id="edit-ttl" class="form-input">
+          </div>
+          <div class="form-group col-span-2">
+            <label>Alamat Lengkap</label>
+            <textarea id="edit-alamat" class="form-textarea" rows="2"></textarea>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" data-modal-close>Batal</button>
+        <button class="btn btn-primary" id="btn-save-student-edit">Simpan Perubahan</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal 2: Photo Picker / Reassign Photo -->
+  <div class="modal-overlay" id="modal-photo-picker">
+    <div class="modal-box" style="max-width: 780px;">
+      <div class="modal-header">
+        <div>
+          <h3>🖼️ Pilih atau Ganti Foto Siswa</h3>
+          <p style="font-size: 12px; color: var(--text-muted); margin-top: 2px;">
+            Siswa: <strong id="photo-picker-student-name" style="color: var(--primary);"></strong>
+          </p>
+        </div>
+        <button class="modal-close" data-modal-close>&times;</button>
+      </div>
+      <div class="modal-body">
+        <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 16px;">
+          Pilih salah satu foto dari folder rombel kelas ini, atau klik tombol upload untuk mengunggah foto baru.
+        </p>
+        <div id="photo-picker-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 14px;">
+          <!-- Dynamically filled with photos in class folder -->
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" data-modal-close>Tutup</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal 3: School & Card Customization Settings -->
+  <div class="modal-overlay" id="modal-settings">
+    <div class="modal-box" style="max-width: 740px;">
+      <div class="modal-header">
+        <h3>⚙️ Pengaturan Desain & Informasi Kartu</h3>
+        <button class="modal-close" data-modal-close>&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-grid">
+          <div class="form-group col-span-2">
+            <label>Nama Sekolah (Kop Atas)</label>
+            <input type="text" id="setting-name" class="form-input">
+          </div>
+          <div class="form-group">
+            <label>Alamat Baris 1 (Kop)</label>
+            <input type="text" id="setting-sub1" class="form-input">
+          </div>
+          <div class="form-group">
+            <label>Alamat Baris 2 (Kop)</label>
+            <input type="text" id="setting-sub2" class="form-input">
+          </div>
+          <div class="form-group">
+            <label>Judul Kartu</label>
+            <input type="text" id="setting-card-title" class="form-input">
+          </div>
+          <div class="form-group">
+            <label>Titimangsa / Tanggal Penerbitan</label>
+            <input type="text" id="setting-city-date" class="form-input">
+          </div>
+          <div class="form-group">
+            <label>Jabatan Penandatangan</label>
+            <input type="text" id="setting-principal-title" class="form-input">
+          </div>
+          <div class="form-group">
+            <label>Nama Kepala Sekolah</label>
+            <input type="text" id="setting-principal-name" class="form-input">
+          </div>
+          <div class="form-group col-span-2">
+            <label>NIP Kepala Sekolah</label>
+            <input type="text" id="setting-principal-nip" class="form-input">
+          </div>
+          <div class="form-group col-span-2">
+            <label>Catatan Berlaku (Bawah Kartu Belakang)</label>
+            <input type="text" id="setting-footer-note" class="form-input">
+          </div>
+          <div class="form-group">
+            <label>Ganti Logo Sekolah</label>
+            <input type="file" id="input-custom-logo" accept="image/*" class="form-input">
+          </div>
+          <div class="form-group">
+            <label>Ganti Tanda Tangan & Stempel</label>
+            <input type="file" id="input-custom-signature" accept="image/*" class="form-input">
+          </div>
+          <div class="form-group">
+            <label>Format Isi QR Code</label>
+            <select id="setting-qr-format" class="form-select">
+              <option value="default">Ringkas (NISN | Nama | Kelas)</option>
+              <option value="nisn">Hanya Nomor NISN</option>
+              <option value="vcard">vCard Lengkap (Nama, NISN, Sekolah)</option>
+            </select>
+          </div>
+          <div class="form-group" style="justify-content: center; margin-top: 10px;">
+            <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+              <input type="checkbox" id="setting-show-signature" checked style="width: 16px; height: 16px;">
+              <span>Tampilkan Gambar TTD & Stempel</span>
+            </label>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" data-modal-close>Batal</button>
+        <button class="btn btn-primary" id="btn-save-settings">Simpan Pengaturan</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal 4: Upload Custom Excel & Photos -->
+  <div class="modal-overlay" id="modal-upload-data">
+    <div class="modal-box" style="max-width: 650px;">
+      <div class="modal-header">
+        <h3>📁 Unggah Berkas Excel & Folder Foto Baru</h3>
+        <button class="modal-close" data-modal-close>&times;</button>
+      </div>
+      <div class="modal-body">
+        <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 20px;">
+          Fitur ini memungkinkan Anda memproses data kartu untuk angkatan atau sekolah lain secara otomatis dengan sistem pendeteksi nama pintar.
+        </p>
+
+        <div class="form-group" style="margin-bottom: 18px;">
+          <label>1. Pilih File Excel (.xlsx / .xls)</label>
+          <input type="file" id="upload-excel-file" accept=".xlsx, .xls, .csv" class="form-input">
+          <span id="upload-excel-status" style="font-size: 12px; color: var(--success); margin-top: 4px; display: block;"></span>
+        </div>
+
+        <div class="form-group" style="margin-bottom: 24px;">
+          <label>2. Pilih Folder Foto Siswa</label>
+          <input type="file" id="upload-photos-folder" webkitdirectory directory multiple class="form-input">
+          <span id="upload-photos-status" style="font-size: 12px; color: var(--success); margin-top: 4px; display: block;"></span>
+        </div>
+
+        <div style="background-color: var(--primary-light); padding: 14px; border-radius: var(--radius-md); font-size: 12px; color: var(--primary);">
+          💡 <strong>Deteksi Pintar Aktif:</strong> Aplikasi secara otomatis mendeteksi kecocokan nama file foto dengan nama di Excel menggunakan algoritma fonetik dan Levenshtein distance.
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" data-modal-close>Batal</button>
+        <button class="btn btn-primary" id="btn-process-upload">Mulai Proses & Generate</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal 5: Print A4 Sheet Options -->
+  <div class="modal-overlay" id="modal-print-sheet">
+    <div class="modal-box" style="max-width: 580px;">
+      <div class="modal-header">
+        <h3>🖨️ Cetak Lembar A4 (Layout 10 Kartu)</h3>
+        <button class="modal-close" data-modal-close>&times;</button>
+      </div>
+      <div class="modal-body">
+        <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 18px;">
+          Kelas yang akan dicetak: <strong id="print-class-label" style="color: var(--primary);"></strong><br>
+          Format kertas: <strong>A4 Portrait</strong> (2 kolom × 5 baris = 10 kartu per lembar).
+        </p>
+
+        <div style="display: flex; flex-direction: column; gap: 12px; margin-bottom: 20px;">
+          <label style="display: flex; align-items: flex-start; gap: 10px; cursor: pointer; padding: 12px; border: 1px solid var(--border-color); border-radius: 8px;">
+            <input type="radio" name="print_mode" value="duplex" checked style="margin-top: 3px;">
+            <div>
+              <strong style="font-size: 13px; color: var(--text-main);">Mode Dupleks / Bolak-Balik (Rekomendasi)</strong>
+              <p style="font-size: 12px; color: var(--text-muted); margin-top: 2px;">
+                Halaman ganjil berisi sisi depan, halaman genap berisi sisi belakang yang dicerminkan (mirrored) agar pas saat diprint 2 sisi!
+              </p>
+            </div>
+          </label>
+
+          <label style="display: flex; align-items: flex-start; gap: 10px; cursor: pointer; padding: 12px; border: 1px solid var(--border-color); border-radius: 8px;">
+            <input type="radio" name="print_mode" value="fronts_only" style="margin-top: 3px;">
+            <div>
+              <strong style="font-size: 13px; color: var(--text-main);">Hanya Sisi Depan</strong>
+              <p style="font-size: 12px; color: var(--text-muted); margin-top: 2px;">
+                Mencetak seluruh kartu sisi depan saja.
+              </p>
+            </div>
+          </label>
+
+          <label style="display: flex; align-items: flex-start; gap: 10px; cursor: pointer; padding: 12px; border: 1px solid var(--border-color); border-radius: 8px;">
+            <input type="radio" name="print_mode" value="backs_only" style="margin-top: 3px;">
+            <div>
+              <strong style="font-size: 13px; color: var(--text-main);">Hanya Sisi Belakang</strong>
+              <p style="font-size: 12px; color: var(--text-muted); margin-top: 2px;">
+                Mencetak seluruh kartu sisi belakang saja.
+              </p>
+            </div>
+          </label>
+        </div>
+
+        <div style="font-size: 12px; color: #64748B;">
+          💡 <em>Tips Cetak: Pada dialog browser printer, pastikan atur <strong>Scale: 100% (Actual Size)</strong> dan <strong>Margins: None / Minimum</strong>.</em>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" data-modal-close>Batal</button>
+        <button class="btn btn-primary" id="btn-start-print">Buka Lembar Cetak</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal 6: Progress Bar for ZIP / PDF Generation -->
+  <div class="modal-overlay" id="modal-progress">
+    <div class="modal-box" style="max-width: 480px;">
+      <div class="modal-body progress-container">
+        <div style="font-size: 38px; margin-bottom: 8px;">⚙️</div>
+        <h3 id="progress-title" style="font-size: 17px; font-weight: 800; color: var(--primary);">Memproses Kartu Pelajar</h3>
+        <p id="progress-text" style="font-size: 13px; color: var(--text-muted); margin-top: 4px;">Menyiapkan...</p>
+        <div class="progress-bar-lg">
+          <div class="progress-fill-lg" id="progress-bar-fill"></div>
+        </div>
+        <span style="font-size: 11px; color: #94A3B8;">Mohon tunggu, proses rendering sedang berlangsung...</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Hidden Container for Direct Browser A4 Printing -->
+  <div id="print-container"></div>
+
+  <!-- Vendor Libraries -->
+  <script src="js/vendor/qrcode.min.js"></script>
+  <script src="js/vendor/xlsx.full.min.js"></script>
+  <script src="js/vendor/jszip.min.js"></script>
+  <script src="js/vendor/jspdf.umd.min.js"></script>
+
+  <!-- Application Modules -->
+  <script src="js/fuzzy-matcher.js"></script>
+  <script src="js/card-generator.js"></script>
+  <script src="js/export-manager.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
+
